@@ -25,5 +25,9 @@ enable_sanitizers(project_options)
 include(cmake/StaticAnalyzers.cmake)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+add_subdirectory(extern/Catch2)
+include(CTest)
+
 add_subdirectory(citylib)
 add_subdirectory(src)

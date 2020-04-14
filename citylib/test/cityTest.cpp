@@ -55,3 +55,34 @@ TEST_CASE("Query for non-existing citythrows", "[basic]") {
   const auto map = makeMap(root);
   REQUIRE_THROWS(query(map, {"b"}));
 }
+
+TEST_CASE("Queries return correct result", "[basic]") {
+  YAML::Node root = YAML::Load(
+      "{city_001: {name: ab, x: 0, y: 0}, city_002: {name: abb, x: 0, y: 1}, "
+      "city_003: {name: abbb, x: 0, y: 2}, city_004: {name: aabbb, x: 2, y : "
+      "2}, city_005: {name: aaabbb, x: 3, y : 3} }");
+  const auto map = makeMap(root);
+  auto queryResult = query(map, {"aaabbb"});
+  REQUIRE(queryResult.size() == 1);
+  REQUIRE(queryResult.begin()->fromCity.name == "aaabbb");
+  REQUIRE(queryResult.begin()->toCity.name == "NONE");
+
+  queryResult = query(map, {"ab", "abb"});
+  REQUIRE(queryResult.size() == 2);
+  auto queryResultIt = queryResult.begin();
+  REQUIRE(queryResultIt->fromCity.name == "ab");
+  REQUIRE(queryResultIt->toCity.name == "abb");
+  queryResultIt++;
+  REQUIRE(queryResultIt->fromCity.name == "abb");
+  REQUIRE(queryResultIt->toCity.name == "ab");
+
+  queryResult = query(map, {"abbb", "aabbb"});
+  queryResultIt = queryResult.begin();
+  REQUIRE(queryResult.size() == 2);
+  REQUIRE(queryResultIt->fromCity.name == "abbb");
+  REQUIRE(queryResultIt->toCity.name == "aabbb");
+
+  queryResultIt++;
+  REQUIRE(queryResultIt->fromCity.name == "aabbb");
+  REQUIRE(queryResultIt->toCity.name == "abbb");
+}

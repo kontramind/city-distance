@@ -1,6 +1,7 @@
 #include "city.h"
 
 #include <algorithm>
+#include <stdexcept>
 
 std::ostream &operator<<(std::ostream &out, const Location &coords) {
   out << "x: " << coords.x << ", y: " << coords.y;
@@ -87,6 +88,10 @@ CloseCitiesMap makeMap(const YAML::Node &root) {
 
 SortedCloseCitiesMap query(const CloseCitiesMap &closeCityMap,
                            std::vector<std::string> queryCities) {
+  if (closeCityMap.empty()) {
+    throw std::runtime_error("Query on emmpty map not possible");
+  }
+
   SortedCloseCitiesMap sortedCloseCities;
   for (const auto &qCity : queryCities) {
     const auto it = closeCityMap.find(qCity);

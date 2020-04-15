@@ -9,8 +9,7 @@ std::ostream &operator<<(std::ostream &out, const Location &coords) {
 }
 
 std::ostream &operator<<(std::ostream &out, const City &city) {
-  out << "[" << city.insertionIndex << "] name: " << city.name << ", "
-      << city.coordinates;
+  out << "name: " << city.name << ", " << city.coordinates;
   return out;
 }
 
@@ -29,7 +28,7 @@ std::ostream &operator<<(std::ostream &out, const CloseCitiesMap &cities) {
 }
 
 std::ostream &operator<<(std::ostream &out,
-                         const SortedCloseCitiesMap &cities) {
+                         const CityToCityCollection &cities) {
   std::for_each(cities.cbegin(), cities.cend(), [&out](const auto &cityPair) {
     out << cityPair.fromCity.name << " -> " << cityPair.toCity.name << '\n';
   });
@@ -50,11 +49,10 @@ CloseCitiesMap makeMap(const YAML::Node &root) {
   CityCollection cities;
   CloseCitiesMap closeCities;
 
-  int insertionIndex{0};
   for (const auto &node : root) {
-    const City newCity{{node.second["name"].as<std::string>()},
-                       {node.second["x"].as<int>(), node.second["y"].as<int>()},
-                       insertionIndex++};
+    const City newCity{
+        {node.second["name"].as<std::string>()},
+        {node.second["x"].as<int>(), node.second["y"].as<int>()}};
 
     cities.emplace_back(newCity);
     for (const auto existingCity : cities) {
@@ -86,18 +84,18 @@ CloseCitiesMap makeMap(const YAML::Node &root) {
   return closeCities;
 }
 
-SortedCloseCitiesMap query(const CloseCitiesMap &closeCityMap,
+CityToCityCollection query(const CloseCitiesMap &closeCityMap,
                            std::vector<std::string> queryCities) {
   if (closeCityMap.empty()) {
     throw std::runtime_error("Query on emmpty map not possible");
   }
 
-  SortedCloseCitiesMap sortedCloseCities;
+  CityToCityCollection result;
   for (const auto &qCity : queryCities) {
     const auto it = closeCityMap.find(qCity);
     if (it != closeCityMap.end()) {
-      sortedCloseCities.insert(it->second);
+      result.emplace_back(it->second);
     }
   }
-  return sortedCloseCities;
+  return result;
 }

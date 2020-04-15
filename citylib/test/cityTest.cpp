@@ -14,16 +14,15 @@ TEST_CASE("Verify Location defaults", "[basic]") {
 TEST_CASE("Verify City defaults", "[basic]") {
   const City city;
   REQUIRE(city.name == "NONE");
-  REQUIRE(city.insertionIndex == 0);
   REQUIRE(city.coordinates.x == std::numeric_limits<int>::max());
   REQUIRE(city.coordinates.y == std::numeric_limits<int>::max());
 }
 
 TEST_CASE("Distance returns correct value", "[basic]") {
-  const auto cityA = City{"A", {0, 0}, 0};
-  const auto cityB = City{"B", {0, 1}, 1};
-  const auto cityC = City{"C", {1, 1}, 2};
-  const auto cityD = City{"D", {1, 2}, 2};
+  const auto cityA = City{"A", {0, 0}};
+  const auto cityB = City{"B", {0, 1}};
+  const auto cityC = City{"C", {1, 1}};
+  const auto cityD = City{"D", {1, 2}};
 
   SECTION("same city") {
     REQUIRE(distance(cityA, cityA) == 0);
@@ -62,27 +61,42 @@ TEST_CASE("Queries return correct result", "[basic]") {
       "city_003: {name: abbb, x: 0, y: 2}, city_004: {name: aabbb, x: 2, y : "
       "2}, city_005: {name: aaabbb, x: 3, y : 3} }");
   const auto map = makeMap(root);
-  auto queryResult = query(map, {"aaabbb"});
-  REQUIRE(queryResult.size() == 1);
-  REQUIRE(queryResult.begin()->fromCity.name == "aaabbb");
-  REQUIRE(queryResult.begin()->toCity.name == "NONE");
 
-  queryResult = query(map, {"ab", "abb"});
-  REQUIRE(queryResult.size() == 2);
-  auto queryResultIt = queryResult.begin();
-  REQUIRE(queryResultIt->fromCity.name == "ab");
-  REQUIRE(queryResultIt->toCity.name == "abb");
-  queryResultIt++;
-  REQUIRE(queryResultIt->fromCity.name == "abb");
-  REQUIRE(queryResultIt->toCity.name == "ab");
+  SECTION("correcteness") {
+    auto queryResult = query(map, {"aaabbb"});
+    REQUIRE(queryResult.size() == 1);
+    REQUIRE(queryResult.begin()->fromCity.name == "aaabbb");
+    REQUIRE(queryResult.begin()->toCity.name == "NONE");
 
-  queryResult = query(map, {"abbb", "aabbb"});
-  queryResultIt = queryResult.begin();
-  REQUIRE(queryResult.size() == 2);
-  REQUIRE(queryResultIt->fromCity.name == "abbb");
-  REQUIRE(queryResultIt->toCity.name == "aabbb");
+    queryResult = query(map, {"ab", "abb"});
+    REQUIRE(queryResult.size() == 2);
+    auto queryResultIt = queryResult.begin();
+    REQUIRE(queryResultIt->fromCity.name == "ab");
+    REQUIRE(queryResultIt->toCity.name == "abb");
+    queryResultIt++;
+    REQUIRE(queryResultIt->fromCity.name == "abb");
+    REQUIRE(queryResultIt->toCity.name == "ab");
+  }
 
-  queryResultIt++;
-  REQUIRE(queryResultIt->fromCity.name == "aabbb");
-  REQUIRE(queryResultIt->toCity.name == "abbb");
+  SECTION("result order") {
+    auto queryResult = query(map, {"abbb", "aabbb"});
+    auto queryResultIt = queryResult.begin();
+    REQUIRE(queryResult.size() == 2);
+    REQUIRE(queryResultIt->fromCity.name == "abbb");
+    REQUIRE(queryResultIt->toCity.name == "aabbb");
+
+    queryResultIt++;
+    REQUIRE(queryResultIt->fromCity.name == "aabbb");
+    REQUIRE(queryResultIt->toCity.name == "abbb");
+
+    queryResult = query(map, {"aabbb", "abbb"});
+    queryResultIt = queryResult.begin();
+    REQUIRE(queryResult.size() == 2);
+    REQUIRE(queryResultIt->fromCity.name == "aabbb");
+    REQUIRE(queryResultIt->toCity.name == "abbb");
+
+    queryResultIt++;
+    REQUIRE(queryResultIt->fromCity.name == "abbb");
+    REQUIRE(queryResultIt->toCity.name == "aabbb");
+  }
 }

@@ -4,8 +4,8 @@
 
 #include <iostream>
 #include <limits>
-#include <map>
 #include <set>
+#include <unordered_map>
 #include <vector>
 
 namespace Cities {
@@ -29,7 +29,7 @@ public:
 
 using CityCollection = std::vector<City>;
 using CityPairCollection = std::vector<CityPair>;
-using CloseCitiesMap = std::map<std::string, CityPair>;
+using CloseCitiesMap = std::unordered_map<std::string, CityPair>;
 
 std::ostream &operator<<(std::ostream &out, const City &city);
 std::ostream &operator<<(std::ostream &out, const Location &coords);

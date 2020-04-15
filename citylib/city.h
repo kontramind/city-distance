@@ -8,6 +8,7 @@
 #include <set>
 #include <vector>
 
+namespace Cities {
 struct Location {
   int x{std::numeric_limits<int>::max()};
   int y{std::numeric_limits<int>::max()};
@@ -18,26 +19,28 @@ struct City {
   Location coordinates;
 };
 
-class CityToCity {
+class CityPair {
 public:
-  CityToCity() = default;
-  CityToCity(const City &from, const City &to) : fromCity(from), toCity(to){};
+  CityPair() = default;
+  CityPair(const City &from, const City &to) : fromCity(from), toCity(to){};
   City fromCity{};
   City toCity{};
 };
 
 using CityCollection = std::vector<City>;
-using CityToCityCollection = std::vector<CityToCity>;
-using CloseCitiesMap = std::map<std::string, CityToCity>;
+using CityPairCollection = std::vector<CityPair>;
+using CloseCitiesMap = std::map<std::string, CityPair>;
 
 std::ostream &operator<<(std::ostream &out, const City &city);
 std::ostream &operator<<(std::ostream &out, const Location &coords);
 std::ostream &operator<<(std::ostream &out, const CityCollection &cities);
 std::ostream &operator<<(std::ostream &out, const CloseCitiesMap &cities);
-std::ostream &operator<<(std::ostream &out, const CityToCityCollection &cities);
+std::ostream &operator<<(std::ostream &out, const CityPairCollection &cities);
 
 bool close(const City &lhs, const City &rhs);
 int distance(const City &lhs, const City &rhs);
 CloseCitiesMap makeMap(const YAML::Node &root);
-CityToCityCollection query(const CloseCitiesMap &closeCityMap,
-                           std::vector<std::string> queryCities);
+CityPairCollection query(const CloseCitiesMap &closeCityMap,
+                         std::vector<std::string> queryCities);
+
+} // namespace Cities

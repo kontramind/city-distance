@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <stdexcept>
 
+namespace Cities {
 std::ostream &operator<<(std::ostream &out, const Location &coords) {
   out << "x: " << coords.x << ", y: " << coords.y;
   return out;
@@ -27,8 +28,7 @@ std::ostream &operator<<(std::ostream &out, const CloseCitiesMap &cities) {
   return out;
 }
 
-std::ostream &operator<<(std::ostream &out,
-                         const CityToCityCollection &cities) {
+std::ostream &operator<<(std::ostream &out, const CityPairCollection &cities) {
   std::for_each(cities.cbegin(), cities.cend(), [&out](const auto &cityPair) {
     out << cityPair.fromCity.name << " -> " << cityPair.toCity.name << '\n';
   });
@@ -63,8 +63,8 @@ CloseCitiesMap makeMap(const YAML::Node &root) {
       if (close(existingCity, newCity)) {
         const auto it = closeCities.find(existingCity.name);
         if (it == closeCities.end()) {
-          closeCities[existingCity.name] = CityToCity{existingCity, newCity};
-          closeCities[newCity.name] = CityToCity{newCity, existingCity};
+          closeCities[existingCity.name] = CityPair{existingCity, newCity};
+          closeCities[newCity.name] = CityPair{newCity, existingCity};
         } else {
           const auto newDistance = distance(existingCity, newCity);
           const auto existingDistance =
@@ -84,13 +84,13 @@ CloseCitiesMap makeMap(const YAML::Node &root) {
   return closeCities;
 }
 
-CityToCityCollection query(const CloseCitiesMap &closeCityMap,
-                           std::vector<std::string> queryCities) {
+CityPairCollection query(const CloseCitiesMap &closeCityMap,
+                         std::vector<std::string> queryCities) {
   if (closeCityMap.empty()) {
     throw std::runtime_error("Query on emmpty map not possible");
   }
 
-  CityToCityCollection result;
+  CityPairCollection result;
   for (const auto &qCity : queryCities) {
     const auto it = closeCityMap.find(qCity);
     if (it != closeCityMap.end()) {
@@ -99,3 +99,4 @@ CityToCityCollection query(const CloseCitiesMap &closeCityMap,
   }
   return result;
 }
+} // namespace Cities

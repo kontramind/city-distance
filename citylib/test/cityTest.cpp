@@ -5,6 +5,8 @@
 
 #include <limits>
 
+using namespace Cities;
+
 TEST_CASE("Verify Location defaults", "[basic]") {
   const Location location;
   REQUIRE(location.x == std::numeric_limits<int>::max());

@@ -4,6 +4,7 @@ add_library(
     city.cpp
     )
 
+target_compile_features(citylib PUBLIC cxx_std_17)
 target_include_directories(citylib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_executable(cityTest
